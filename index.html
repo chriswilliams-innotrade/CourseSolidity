@@ -77,6 +77,17 @@
                         "type": "function"
                     },
                     {
+                        "inputs": [
+                            {
+                                "name": "",
+                                "type": "address"
+                            }
+                        ],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "constructor"
+                    },
+                    {
                         "constant": true,
                         "inputs": [],
                         "name": "getInstructor",
@@ -96,7 +107,7 @@
                     }
                 ]);
 
-                var CourseSolidity = CourseSolidityContract('0x1474bf67c4f9ba64d61c575cc2e06a1479b689b4');
+                var CourseSolidity = CourseSolidityContract('0xfa403dd74685a65de82f3416c0f7aa6a962313ba');
                 
 
                 var instructorEvent = CourseSolidity.Instructor();
@@ -107,16 +118,18 @@
                         $("#instructor").html(result.args.name + ' (' + result.args.age + ' years old)');
                     } else {
                         $("#loader").hide();
-                        console.log(error);
                     }
                 }); 
 
                 $("#button").click(function() {
-                    CourseSolidity.setInstructor($("#name").val(), $("#age").val());
+                    CourseSolidity.setInstructor($("#name").val(), $("#age").val(), (err, res) => {
+                        if (err) {
+                            $("#loader").hide();
+                            console.log('oh no');
+                        }
+                    });
+                    //$("#loader").show();
                 });
-
-
-
 
 
         </script>
