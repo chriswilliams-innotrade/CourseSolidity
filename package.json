@@ -9,6 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "web3": "^1.0.0-beta.34"
+       "web3": "github:ethereum/web3.js"
+  },
+  "devDependencies": {
+    "lite-server": "^2.4.0",
+    "dev": "^0.1.3"
   }
 }
