@@ -19,15 +19,15 @@ contract CourseSolidity {
         uint age
     );
     
-   function setInstructor(string _fName, uint _age) onlyOwner public {
-       fName = _fName;
-       age = _age;
-       emit Instructor(_fName, _age);
-   }
+    function setInstructor(string _fName, uint _age) onlyOwner public {
+        fName = _fName;
+        age = _age;
+        emit Instructor(_fName, _age);
+    }
    
-   function getInstructor() public constant returns (string, uint){
-       return (fName, age); 
-   }
+    function getInstructor() view public returns (string, uint){
+        return (fName, age); 
+    }
 }
     
     
