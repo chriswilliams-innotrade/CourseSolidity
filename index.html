@@ -27,6 +27,9 @@
 
         <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
 
+        <label for="address" class "col-lg-2 control-label">Address</label>
+        <input id="address" type="text">
+
         <label for="fName" class "col-lg-2 control-label">First Name</label>
         <input id="fName" type="text">
 
@@ -176,17 +179,57 @@
             }
         ]);
 
-        var CourseSolidity = CourseSolidityContract.at('0xc109dda82a23333e406277393793ec68743bb604');
-
+        var CourseSolidity = CourseSolidityContract.at('0xd49f3916b283652987d89b5ac006c3822fd0e8bf');
 
         var instructorEvent = CourseSolidity.instructorInfo({}, 'latest');
 
+        const promisify = (method) => (...args) => new Promise((resolve, reject) => {
+            method(...args, (err, res) => {
+                if (err) reject(err)
+                else resolve(res)
+            })
+        })
+
+        const updateInstructors = async () => {
+            try {
+                const instructors = await promisify(CourseSolidity.getInstructors)()
+                const results = await Promise.all(
+                    instructors.map(
+                        (instructor) => promisify(CourseSolidity.getInstructor)(instructor)
+                    )
+                )
+                results.forEach(([age, fName, lName]) => {
+                    console.log('async/await', (new BigNumber(age).toString()), web3.toAscii(fName), web3.toAscii(lName))
+                })
+            }
+            catch (err) {
+                console.error(err)
+            }
+
+            /*
+            CourseSolidity.getInstructors((err, instructors) => {
+                // if (instructors) $('#countIns').html(res.c + ' Instructors');
+                console.log(instructors);
+                for (let instructor of instructors) {
+                    console.log(instructor);
+                    CourseSolidity.getInstructor(instructor, (err, res) => {
+                        console.log(res);
+                        const [age, fName, lName] = res;
+                        console.log((new BigNumber(age).toString()), web3.toAscii(fName), web3.toAscii(lName));
+                    });
+                }
+            })
+            */
+        }
+
         instructorEvent.watch(function (error, result) {
             if (!error) {
+                console.log('result', result)
                 if (result.blockHash != $('#insTrans').html())
                     $("#loader").hide();
-                $('#insTrans').html('Block hash: ' + result.blockhash);
+                $('#insTrans').html('Block hash: ' + result.blockHash);
                 $("#instructor").html(web3.toAscii(result.args.fName) + '  ' + web3.toAscii(result.args.lName) + ' (' + result.args.age + ' years old)');
+                updateInstructors();
             } else {
                 $("#loader").hide();
             }
@@ -198,23 +241,11 @@
             console.log(res);
         })
 
-        CourseSolidity.getInstructors((err, res) => {
-            // if (res) $('#countIns').html(res.c + ' Instructors');
-            console.log(res);
-            for (let instructor of res) {
-                console.log(instructor);
-                CourseSolidity.getInstructor(instructor, (err, res) => {
-                    console.log(res);
-                    const [age, fName, lName] = res;
-                    console.log((new BigNumber(age).toString()), web3.toAscii(fName), web3.toAscii(lName));
-                });
-            }
-
-        })
+        updateInstructors();
 
         $("#button").click(function () {
             $("#loader").show();
-            CourseSolidity.setInstructor(web3.eth.defaultAccount, $("#age").val(), $("#fName").val(), $("#lName").val(), (err, res) => {
+            CourseSolidity.setInstructor($("#address").val(), $("#age").val(), $("#fName").val(), $("#lName").val(), (err, res) => {
                 if (err) {
                     $("#loader").hide();
                 }

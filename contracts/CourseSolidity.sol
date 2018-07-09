@@ -4,7 +4,7 @@ pragma solidity ^0.4.21;
 contract Owned {
     address owner;
     
-    constructor (Owned) public {
+    constructor() public {
         owner = msg.sender;
     }
     
@@ -40,7 +40,7 @@ contract Courses is Owned {
        instructor.lName = _lName;
        
        instructorAccts.push(_address) -1;
-       instructorInfo(_fName, _lName, _age);
+       emit instructorInfo(_fName, _lName, _age);
     }
    
     function getInstructors() view public returns(address[]) {
